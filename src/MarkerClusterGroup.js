@@ -446,6 +446,7 @@
 		var	markerPoint, closest, z
 		,	gridClusters	= this._gridClusters
 		,	gridUnclustered	= this._gridUnclustered
+		,	singleMode = this.options.singleMarkerMode
 		;
 
 
@@ -472,20 +473,14 @@
 			// Try find a cluster close by
 			if(closest = gridClusters[zoom].getNearObject(markerPoint))
 			{
-				var parent = closest;
 				zoom = this._maxZoom;
-				var newCluster = new MAP.MarkerCluster(this, zoom, layer);
-				gridClusters[zoom].addObject(newCluster, this.ll2px(newCluster, newCluster._cPosition, zoom));
-				layer.__parent = newCluster;
 
-				//First create any new intermediate parent clusters that doesn't exist
-				var lastParent = newCluster;
-				for(z = zoom - 1; z > parent._zoom; z--)
-				{
-					lastParent = new MAP.MarkerCluster(this, z, lastParent);
-					gridClusters[z].addObject(lastParent, this.ll2px(layer, layer.position, z));
+				if (singleMode && zoom - 1 >= closest._zoom) {
+					this._createLayer(gridClusters, closest, zoom, layer);
+				} else {
+					closest._addChild(layer);
+					layer.__parent = closest;
 				}
-				parent._addChild(lastParent);
 
 				return;
 			}
@@ -497,19 +492,8 @@
 				if(parent){ this._removeLayer(closest, false); }
 
 				//Create new cluster with these 2 in it
-				var newCluster = new MAP.MarkerCluster(this, zoom, closest, layer);
-				gridClusters[zoom].addObject(newCluster, this.ll2px(newCluster, newCluster._cPosition, zoom));
+				var newCluster = this._createLayer(gridClusters, this._topClusterLevel, this._maxZoom, layer, closest);
 				closest.__parent = newCluster;
-				layer.__parent = newCluster;
-
-				//First create any new intermediate parent clusters that doesn't exist
-				var lastParent = newCluster;
-				for(z = zoom - 1; z > parent._zoom; z--)
-				{
-					lastParent = new MAP.MarkerCluster(this, z, lastParent);
-					gridClusters[z].addObject(lastParent, this.ll2px(closest, closest.position, z));
-				}
-				parent._addChild(lastParent);
 
 				//Remove closest from this zoom level and any above that it is in, replace with newCluster
 				for(z = zoom; z >= 0; z--)
@@ -524,10 +508,19 @@
 			gridUnclustered[zoom].addObject(layer, markerPoint);
 		}
 
+
 		//Didn't get in anything, add us to the top
-		var parent = this._topClusterLevel;
-		zoom = this._maxZoom;
+		if (singleMode) {
+			this._createLayer(gridClusters, this._topClusterLevel, this._maxZoom, layer);
+		} else {
+			this._topClusterLevel._addChild(layer);
+			layer.__parent = this._topClusterLevel;
+		}
+	};
+
+	MAP.MarkerClusterGroup.prototype._createLayer = function (gridClusters, parent, zoom, layer, closest) {
 		var newCluster = new MAP.MarkerCluster(this, zoom, layer);
+
 		gridClusters[zoom].addObject(newCluster, this.ll2px(newCluster, newCluster._cPosition, zoom));
 		layer.__parent = newCluster;
 
@@ -539,7 +532,9 @@
 			gridClusters[z].addObject(lastParent, this.ll2px(layer, layer.position, z));
 		}
 		parent._addChild(lastParent);
-	};
+
+		return newCluster;
+	}
 
 	MAP.MarkerClusterGroup.prototype._removeLayer = function(marker, removeFromDistanceGrid, dontUpdateMap)
 	{
