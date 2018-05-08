@@ -415,8 +415,8 @@
 	MAP.MarkerCluster.prototype._zoomOrSpiderfy = function(ev)
 	{
 		var	cluster	= this._cluster
-		,	map		= cluster.map
 		,	group	= cluster._group
+		,	map		= group.map
 		,	options	= group.options;
 		// console.log(map.getZoom() === map.getMaxZoom());
 
