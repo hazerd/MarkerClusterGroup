@@ -76,7 +76,7 @@
 
 			var _this = this;
 			GE.addDomListener(div, 'click', function(event) {
-				_this._group.emit('clusterclick', event, _this._group);
+				_this._group.emit('clusterclick', event, _this._group, _this);
 				_this._zoomOrSpiderfy.call(div, event);
 			});
 		}

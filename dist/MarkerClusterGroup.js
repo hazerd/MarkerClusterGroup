@@ -604,7 +604,7 @@ MAP.FeatureGroup = function()
 			{
 				zoom = this._maxZoom;
 
-				if (singleMode && zoom - 1 > closest._zoom) {
+				if (singleMode && zoom - 1 >= closest._zoom) {
 					this._createLayer(gridClusters, closest, zoom, layer);
 				} else {
 					closest._addChild(layer);
@@ -1278,7 +1278,7 @@ MAP.FeatureGroup = function()
 
 			var _this = this;
 			GE.addDomListener(div, 'click', function(event) {
-				_this._group.emit('clusterclick', event, _this._group);
+				_this._group.emit('clusterclick', event, _this._group, _this);
 				_this._zoomOrSpiderfy.call(div, event);
 			});
 		}
