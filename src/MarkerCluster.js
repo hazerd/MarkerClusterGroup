@@ -488,8 +488,8 @@
 	{
 		if(!this._div){ return null; }
 
-		this._div.className = 'cluster cluster-size-' + ('' + this._childCount).length;
-		this._div_count.innerHTML = this._childCount;
+		this._div.className = 'cluster cluster-size-' + ('' + this._childCount || 1).length;
+		this._div_count.innerHTML = this._childCount || 1;
 
 		this.setPosition(this.position);
 

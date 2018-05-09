@@ -1333,7 +1333,7 @@ MAP.FeatureGroup = function()
 
 		for(i = this._childClusters.length - 1; i >= 0; i--)
 		{
-			storageArray.concat(this._childClusters[i].getAllChildMarkers(storageArray));
+			storageArray = storageArray.concat(this._childClusters[i].getAllChildMarkers());
 		}
 
 		return storageArray;
@@ -1653,20 +1653,37 @@ MAP.FeatureGroup = function()
 
 	MAP.MarkerCluster.prototype.zoomToBounds = function()
 	{
-		var map = this._group.map,
-			baseZoom = map.getZoom();
+		var map = this._group.map
+		// var childClusters = this._childClusters.slice(),
+		// 	boundsZoom = map.getBoundsZoom(this._bounds),
+		// 	zoom = this._zoom + 1,
+		// 	mapZoom = map.getZoom(),
+		// 	i;
+		;
 
-		var cluster = this;
+		//calculate how far we need to zoom down to see all of the markers
+		// while (childClusters.length > 0 && boundsZoom > zoom) {
+		// 	zoom++;
+		// 	var newClusters = [];
+		// 	for(i = 0; i < childClusters.length; i++)
+		// 	{
+		// 		newClusters = newClusters.concat(childClusters[i]._childClusters);
+		// 	}
+		// 	childClusters = newClusters;
+		// }
 
-		while (cluster._childClusters.length === 1 && cluster.zoom < 15) {
-			cluster = cluster._childClusters[0];
-		}
-
-		map.fitBounds(cluster._bounds);
-
-		if (baseZoom === map.getZoom()) {
-			map.setZoom(cluster.zoom + 1);
-		}
+		// if(boundsZoom > zoom)
+		// {
+		// 	this._group._map.setView(this.position, zoom);
+		// }
+		// else if(boundsZoom <= mapZoom) //If fitBounds wouldn't zoom us down, zoom us down instead
+		// {
+		// 	this._group._map.setView(this.position, mapZoom + 1);
+		// }
+		// else
+		// {
+			map.fitBounds(this._bounds);
+		// }
 	};
 
 	MAP.MarkerCluster.prototype._updateIcon = function()
